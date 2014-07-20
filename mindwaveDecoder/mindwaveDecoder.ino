@@ -100,13 +100,15 @@ float getAttention()
     generatedChecksum = 255 - generatedChecksum;
     checksum = readOneByte();
     if (checksum != generatedChecksum) return -3; //
+    
+    // we're good to read the payload
     /* Payload */
     for (int i = 0; i < payloadLength; i++) { //
         switch (payloadData[i]) {
-            case 0xD0:
+            case 0xD0: // Headset Connect Sucess
                 sayHeadsetConnected();
                 break;
-            case 4: //
+            case 4: 
                 i++; //
                 attention = payloadData[i]; //
                 break;
@@ -114,7 +116,7 @@ float getAttention()
                 i++;
                 poorQuality = payloadData[i];
                 if (200 == poorQuality) {
-                    setYellow(); //
+                    setYellow(); // Yellow LED indicated poor quality signal
                     return -4;
                 }
                 break;
@@ -130,21 +132,25 @@ float getAttention()
             case 0x80: // skip RAW //
                 i = i + 3; // skip 3 bytes
                 break;
-            case 0x83: // get payload data
+            case 0x83: // get payload data (ASIC 3-byte big endian unsigned integers)
+                // payload data are:
+                // delta, theta, low-alpha, high-alpha, low-beta, high-beta, low-gamma, mid-gamma
+                // byte buff[4]; //original code
                 
-                byte buff[4];
+                byte buff[3]; // create a 3 byte buffer
                 
-                
+                    // delta /////////////////////////
                     
-                    // read 3
+                    // read 3 bytes
                     for(int d = 0; d<3; d++)
                     {
                      i++;
                      buff[d] = payloadData[i];
                     }
                 
-                    delta = (( (unsigned long)buff[0] << 24)
-                         +  ( (unsigned long)buff[1] << 16)
+                    // delta = (( (unsigned long)buff[0] << 24)
+                    
+                         delta =  (( (unsigned long)buff[1] << 16)
                 		 +  ( (unsigned long)buff[2] << 8 )
                 		 +  ( (unsigned long)buff[0])); // need to check this (plus endian-ness) // ensure values make sense
                 
@@ -152,32 +158,114 @@ float getAttention()
                 Serial.println(delta);
                 
                 
-                /*
-                    // read 3
-                    theta
+                    // theta ///////////////////////// 
+                    // read 3 bytes
+                    for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         theta =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8)
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("theta: ");
+                Serial.println(theta);
                     
-                    // read 3
-                    low_alpha
+                    // low_alpha ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         low_alpha =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("low_alpha: ");
+                Serial.println(low_alpha);
                     
-                    // read 3
-                	high_alpha
+                    // high_alpha ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         high_alpha =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("high_alpha: ");
+                Serial.println(high_alpha);
                     
-                    // read 3
-                    low_beta
+                    // low_beta ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         low_beta =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("low_beta: ");
+                Serial.println(low_beta);
                     
-                    // read 3
-                    high_beta
+                   // high_beta ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         high_beta =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("high_beta: ");
+                Serial.println(high_beta);
                     
-                    // read 3
-                    low_gamma
+                    // low_gamma ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         low_gamma =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("low_gamma: ");
+                Serial.println(low_gamma);
                     
-                    // read 3
-                    mid_gamma
+                    // mid_gamma ///////////////////// 
+                    // read 3 bytes
+                     for(int d = 0; d<3; d++)
+                    {
+                     i++;
+                     buff[d] = payloadData[i];
+                    }
+                
+                         mid_gamma =  (( (unsigned long)buff[1] << 16)
+                		 +  ( (unsigned long)buff[2] << 8 )
+                		 +  ( (unsigned long)buff[0]));
+                
+                Serial.print("mid_gamma: ");
+                Serial.println(mid_gamma);
                
-                */
         
                 // advance to push the head past Mr. Crackles
-                i = i + 22;
+                // i = i + 22; // now that we've got all the data.. Mr. Crackles is happy
                 
                 break;
                 
