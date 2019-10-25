@@ -1,0 +1,9 @@
+AT+NAME=”kanish”
+AT+UART=”57600,0,0”
+AT+ROLE=”1”
+AT+PSWD=”1234”
+AT+CMODE=”0”
+AT+BIND=”XXXX,YY,ZZZZZZ” (Mindwave Unique Number)
+AT+IAC=”9E8B33”
+AT+CLASS=”0”
+AT+INQM=”1,9,48”
